@@ -1,0 +1,48 @@
+---
+import Layout from '../../layouts/Layout.astro';
+const query = Astro.url.searchParams.get("query");
+let start = performance.now();
+const res = await fetch("http://localhost:3000/search?query=" + query);
+let time = ((performance.now() - start) / 1000).toPrecision(3);
+const data = await res.json();
+if (Astro.request.method === "POST") {
+	try {
+		const data = await Astro.request.formData();
+		console.log(data.get('query'));
+		return Astro.redirect("/search?query="+data.get('query'));
+	} catch (err) {
+		if (err instanceof Error) {
+			console.error(err.message);
+		}
+	}
+}
+---
+
+<Layout title="Welcome to Search.">
+    <form class="max-w-[95%] md:max-w-xl md:ml-5 max-md:mx-auto my-5" method="post">
+		<label for="default-search" class="mb-2 text-sm font-medium text-gray-900 sr-only dark:text-white">Search</label>
+		<div class="relative">
+			<input type="search" value={query} name="query" id="default-search" class="block w-full p-3 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Search Mockups, Logos..." required />
+			<button type="submit" class="text-white absolute top-0 end-0 bottom-0 bg-blue-700 hover:bg-blue-800 focus:ring-[1px] focus:outline-none font-medium rounded-r-lg px-4 py-2 dark:bg-blue-600 dark:hover:bg-blue-700">
+				<svg class="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
+					<path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"/>
+				</svg>
+			</button>
+		</div>
+	</form>
+    <p class="text-xs text-white/30 mx-10">{data.length} results found ({time} seconds)</p>
+    <div class="mx-10 my-5 mb-20 flex flex-col gap-5">
+        {
+            data.map(item => (
+                <div class="text-white my-3">
+                    <h2 class="text-xl text-blue-500 underline underline-offset-4">
+                        <a href={item[0].url}>{item[0].title}</a>
+                    </h2>
+                    <div class="text-white/80">
+                        {(item[0].description as string).trim().length != 0 ? item[0].description : <i class="text-white/40">No description available</i>}
+                    </div>
+                </div>
+            ))
+        }
+    </div>
+</Layout>
