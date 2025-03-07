@@ -1,8 +1,10 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 const query = Astro.url.searchParams.get("query");
+const apiUrl = import.meta.env.SEARCH_API_URL;
+
 let start = performance.now();
-const res = await fetch("http://localhost:3000/search?query=" + query);
+const res = await fetch(`${apiUrl}/search?query=${query}`);
 let time = ((performance.now() - start) / 1000).toPrecision(3);
 const data = await res.json();
 if (Astro.request.method === "POST") {
