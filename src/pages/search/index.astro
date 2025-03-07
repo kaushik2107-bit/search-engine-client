@@ -4,6 +4,7 @@ const query = Astro.url.searchParams.get("query");
 const apiUrl = import.meta.env.SEARCH_API_URL;
 
 let start = performance.now();
+console.log("Fetching data from", `${apiUrl}/search?query=${query}`);
 const res = await fetch(`${apiUrl}/search?query=${query}`);
 let time = ((performance.now() - start) / 1000).toPrecision(3);
 const data = await res.json();
